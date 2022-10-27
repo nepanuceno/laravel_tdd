@@ -29,6 +29,7 @@ abstract class ModelTestCase extends TestCase
         $this->assertEquals($this->filables(), $fillables);
     }
 
+    //Método que avalia algo que está presente em todos o Models por padrão.
     public function test_incrementing_is_false()
     {
         $incrementing = $this->model()->incrementing;
