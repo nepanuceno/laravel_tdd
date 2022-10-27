@@ -3,66 +3,43 @@
 namespace Tests\Unit\App\Models;
 
 use App\Models\User;
-use PHPUnit\Framework\TestCase;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Tests\Unit\App\Models\ModelTestCase;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class UserTest extends TestCase
+class UserTest extends ModelTestCase
 {
     protected function model(): Model
     {
         return new User();
     }
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    public function test_traits()
+
+    protected function traits(): array
     {
-        $traits = array_keys(class_uses($this->model()));
-        $expectedTraits = [
+        return [
             HasApiTokens::class,
             HasFactory::class,
             Notifiable::class
         ];
-
-        $this->assertEquals($expectedTraits, $traits);
     }
 
-    public function test_filables()
+    protected function filables(): array
     {
-        $fillables = $this->model()->getFillable();
-
-        $expectedFillables = [
+        return [
             'name',
             'email',
             'password',
         ];
-
-        $this->assertEquals($expectedFillables, $fillables);
-
     }
 
-    public function test_incrementing_is_false()
+    protected function casts(): array
     {
-        $incrementing = $this->model()->incrementing;
-        $this->assertFalse($incrementing);
-    }
-
-    public function test_has_casts()
-    {
-        $expectedCasts = [
+        return [
             'id' => 'string',
             'email_verified_at' => 'datetime',
             // 'deleted_at' => 'datetime',
         ];
-        $casts = $this->model()->getCasts();
-
-        $this->assertEquals($expectedCasts, $casts);
-        // dump($casts);
-
     }
 }
