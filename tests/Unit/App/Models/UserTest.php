@@ -45,4 +45,24 @@ class UserTest extends TestCase
         $this->assertEquals($expectedFillables, $fillables);
 
     }
+
+    public function test_incrementing_is_false()
+    {
+        $incrementing = $this->model()->incrementing;
+        $this->assertFalse($incrementing);
+    }
+
+    public function test_has_casts()
+    {
+        $expectedCasts = [
+            'id' => 'string',
+            'email_verified_at' => 'datetime',
+            // 'deleted_at' => 'datetime',
+        ];
+        $casts = $this->model()->getCasts();
+
+        $this->assertEquals($expectedCasts, $casts);
+        // dump($casts);
+
+    }
 }
