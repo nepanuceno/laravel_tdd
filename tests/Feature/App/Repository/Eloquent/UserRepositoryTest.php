@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\App\Repository\Eloquent;
 
+use Throwable;
 use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use App\Repository\Eloquent\UserRepository;
-use App\Repository\Interfaces\UserRepositoryInterface;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Repository\Interfaces\UserRepositoryInterface;
+use App\Repository\Eloquent\Exception\NotFoundException;
+use App\Repository\Eloquent\Exception\NotFountException;
 use Tests\Feature\App\Repository\Eloquent\UserRepositoryTest as EloquentUserRepositoryTest;
 
 class UserRepositoryTest extends TestCase
@@ -46,11 +50,6 @@ class UserRepositoryTest extends TestCase
         $this->assertCount(10,  $response);
     }
 
-    // public function test_store()
-    // {
-
-    // }
-
     public function test_create()
     {
         $data = [
@@ -66,5 +65,57 @@ class UserRepositoryTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'paulo.torres.apps@gmail.com'
         ]);
+    }
+
+    public function test_create_exception()
+    {
+        $this->expectException(QueryException::class);
+
+        $data = [
+            'name' => 'Paulo Roberto Torres',
+            'password' => bcrypt('123456'),
+        ];
+
+        $this->repositoryUser->create($data);
+    }
+
+    public function test_update()
+    {
+        $user = User::factory()->create();
+        $data = [
+            'name' => 'New Name',
+        ];
+        $response = $this->repositoryUser->update($user->email, $data);
+
+        $this->assertNotNull($response);
+        $this->assertIsObject($response);
+
+        $this->assertDatabaseHas('users',
+        [
+            'name' => 'New Name'
+        ]);
+    }
+
+    public function test_delete()
+    {
+        $user = User::factory()->create();
+        $response = $this->repositoryUser->delete($user->email);
+
+        $this->assertTrue($response);
+        $this->assertDatabaseMissing('users',
+            [
+                'email' => $user->email
+            ]
+        );
+    }
+
+    public function test_delete_not_found()
+    {
+        try {
+            $this->repositoryUser->delete('fake@mail.com');
+            $this->assertTrue(false);
+        } catch (Throwable $th) {
+            $this->assertInstanceOf(NotFoundException::class, $th);
+        }
     }
 }

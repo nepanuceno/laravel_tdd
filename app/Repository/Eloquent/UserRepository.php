@@ -4,6 +4,7 @@ namespace App\Repository\Eloquent;
 
 use App\Models\User;
 use App\Repository\Interfaces\UserRepositoryInterface;
+use App\Repository\Eloquent\Exception\NotFoundException;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -23,4 +24,25 @@ class UserRepository implements UserRepositoryInterface
     {
         return $this->model->create($data);
     }
+
+    public function update(string $email, array $data): object
+    {
+        $user = $this->model->where('email', $email)->first();
+        $user->update($data);
+        $user->refresh();
+        return $user;
+    }
+
+    public function delete(string $email): bool
+    {
+
+        $user = $this->model->where('email', $email)->first();
+
+        if(!$user) {
+            throw new NotFoundException("User not Found");
+        }
+
+        return $user->delete();
+    }
+
 }
