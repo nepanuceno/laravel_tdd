@@ -12,9 +12,17 @@ use Tests\Feature\App\Repository\Eloquent\UserRepositoryTest as EloquentUserRepo
 
 class UserRepositoryTest extends TestCase
 {
+    protected $repositoryUser;
+
+    protected function setUp(): void
+    {
+        $this->repositoryUser =  new UserRepository(new User());
+        parent::setUp();
+    }
+
     public function test_implements_interface()
     {
-        $this->assertInstanceOf(UserRepositoryInterface::class, new UserRepository(new User()));
+        $this->assertInstanceOf(UserRepositoryInterface::class,  $this->repositoryUser);
     }
 
     /**
@@ -24,8 +32,7 @@ class UserRepositoryTest extends TestCase
      */
     public function test_find_all_empty()
     {
-        $repository = new UserRepository(new User());
-        $response = $repository->findAll();
+        $response = $this->repositoryUser->findAll();
         $this->assertIsArray( $response);
         $this->assertCount(0,  $response);
     }
@@ -34,8 +41,7 @@ class UserRepositoryTest extends TestCase
     {
         User::factory()->count(10)->create();
 
-        $repository = new UserRepository(new User());
-        $response = $repository->findAll();
+        $response = $this->repositoryUser->findAll();
         $this->assertIsArray( $response);
         $this->assertCount(10,  $response);
     }
