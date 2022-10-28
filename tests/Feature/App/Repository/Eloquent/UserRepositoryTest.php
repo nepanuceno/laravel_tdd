@@ -111,11 +111,7 @@ class UserRepositoryTest extends TestCase
 
     public function test_delete_not_found()
     {
-        try {
-            $this->repositoryUser->delete('fake@mail.com');
-            $this->assertTrue(false);
-        } catch (Throwable $th) {
-            $this->assertInstanceOf(NotFoundException::class, $th);
-        }
+        $this->expectException(NotFoundException::class);
+        $this->repositoryUser->delete('fake@mail.com');
     }
 }
