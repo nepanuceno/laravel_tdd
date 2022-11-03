@@ -18,7 +18,16 @@ class UserController extends Controller
 
     public function index()
     {
-        $usersData = collect($this->repositoryInterface->paginate()->items());
-        return UserResource::collection($usersData);
+        $usersData = $this->repositoryInterface->paginate();
+        return UserResource::collection(collect($usersData->items()))
+                ->additional([
+                    'meta' => [
+                        'total' => $usersData->total(),
+                        'current_page' => $usersData->currentPage(),
+                        'last_page' => $usersData->lastPage(),
+                        'first_page' => $usersData->firstPage(),
+                        'per_page' => $usersData->perPage(),
+                    ]
+                ]);
     }
 }
