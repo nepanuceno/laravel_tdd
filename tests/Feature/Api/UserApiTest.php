@@ -52,30 +52,39 @@ class UserApiTest extends TestCase
         ];
     }
 
-    public function test_create()
+    /**
+     * @dataProvider dataProviderCreateUser
+     */
+    public function test_create(array $payload, int $statusCode, array $structureResponse)
     {
-        $payload = [
-            'name' => 'Paulo Roberto Torres',
-            'email' => 'paulo.torres.apps@gmail.com',
-            'password' => '12345678'
-        ];
-
         $response = $this->postJson($this->endpoint, $payload);
-        $response->assertCreated();
-        $response->assertJsonStructure([
-            'data'=> ['id', 'name', 'email']
-        ]);
+        $response->assertStatus($statusCode);
+        $response->assertJsonStructure($structureResponse);
     }
 
-    public function test_create_validations()
+    public function dataProviderCreateUser(): array
     {
-        $payload = [
-            'name' => 'Paulo Roberto Torres',
-            'email' => 'paulo.torres.apps@gmail.com',
-            'password' => '123'
-        ];
-
-        $response = $this->postJson($this->endpoint, $payload);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        return [
+                    'test_create_user' => [
+                        'payload' => [
+                            'name' => 'Paulo Roberto Torres',
+                            'email' => 'paulo.torres.apps@gmail.com',
+                            'password' => '12345678'
+                        ],
+                        'statusCode' => Response::HTTP_CREATED,
+                        'structureResponse' => [
+                            'data'=> ['id', 'name', 'email']
+                        ]
+                    ],
+                    'validation_create_user' => [
+                        'payload' => [
+                            'name' => 'Paulo Roberto Torres',
+                            'email' => 'paulo.torres.apps@gmail.com',
+                            'password' => '123'
+                        ],
+                        'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                        'structureResponse' => []
+                    ]
+                ];
     }
 }
