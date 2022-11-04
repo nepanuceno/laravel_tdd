@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserStoreRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Repository\Interfaces\UserRepositoryInterface;
 
 class UserController extends Controller
@@ -34,13 +35,19 @@ class UserController extends Controller
 
     public function store(UserStoreRequest $request)
     {
-        $user = $this->repositoryInterface->create($request->all());
+        $user = $this->repositoryInterface->create($request->validated());
         return new UserResource($user);
     }
 
     public function show($email)
     {
         $user = $this->repositoryInterface->find($email);
+        return new UserResource($user);
+    }
+
+    public function update(UserUpdateRequest $request, $email)
+    {
+        $user = $this->repositoryInterface->update($email, $request->validated());
         return new UserResource($user);
     }
 }

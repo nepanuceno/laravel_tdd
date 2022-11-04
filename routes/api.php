@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/users/{email}', [UserController::class, 'show']);
+Route::put('/users/{email}', [UserController::class, 'update']);
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);

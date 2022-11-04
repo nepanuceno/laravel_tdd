@@ -29,13 +29,17 @@ class UserRepository implements UserRepositoryInterface
 
     public function create(array $data): object
     {
+        $data['password'] = bcrypt($data['password']);
         return $this->model->create($data);
     }
 
     public function update(string $email, array $data): object
     {
-        $user = $this->find($email)->first();
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
 
+        $user = $this->find($email)->first();
         $user->update($data);
         $user->refresh();
         return $user;

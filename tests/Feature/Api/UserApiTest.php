@@ -113,4 +113,37 @@ class UserApiTest extends TestCase
 
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
+
+    public function test_user_update()
+    {
+        $user = User::factory()->create();
+
+        $payload = [
+            'name' => 'Name UPdate',
+            'password' => 'new_password'
+        ];
+
+        $response = $this->putJson("{$this->endpoint}/{$user->email}", $payload);
+
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    public function test_user_update_validations()
+    {
+        $user = User::factory()->create();
+
+        $payload = [
+            'name' => 'Name Update',
+            'password' => 'ne'
+        ];
+
+        $response = $this->putJson("{$this->endpoint}/{$user->email}", $payload);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    // public function test_user_delete()
+    // {
+
+    // }
 }
