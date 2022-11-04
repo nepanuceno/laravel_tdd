@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserStoreRequest;
 use App\Http\Resources\UserResource;
 use App\Repository\Interfaces\UserRepositoryInterface;
 
@@ -31,7 +32,7 @@ class UserController extends Controller
                 ]);
     }
 
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
         $user = $this->repositoryInterface->create($request->all());
         return new UserResource($user);

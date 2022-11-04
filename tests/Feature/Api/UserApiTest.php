@@ -61,10 +61,21 @@ class UserApiTest extends TestCase
         ];
 
         $response = $this->postJson($this->endpoint, $payload);
-        $response->dump();
         $response->assertCreated();
         $response->assertJsonStructure([
             'data'=> ['id', 'name', 'email']
         ]);
+    }
+
+    public function test_create_validations()
+    {
+        $payload = [
+            'name' => 'Paulo Roberto Torres',
+            'email' => 'paulo.torres.apps@gmail.com',
+            'password' => '123'
+        ];
+
+        $response = $this->postJson($this->endpoint, $payload);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
