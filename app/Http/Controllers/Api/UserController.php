@@ -37,4 +37,10 @@ class UserController extends Controller
         $user = $this->repositoryInterface->create($request->all());
         return new UserResource($user);
     }
+
+    public function show($email)
+    {
+        $user = $this->repositoryInterface->find($email);
+        return new UserResource($user);
+    }
 }

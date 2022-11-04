@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use App\Repository\Eloquent\Exception\NotFoundException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use PhpParser\Node\Expr;
 
 class Handler extends ExceptionHandler
 {
@@ -46,5 +49,19 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof NotFoundException) {
+            return response()->json(
+                [
+                    'error' => $exception->getMessage()
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        return parent::render($request, $exception);
     }
 }

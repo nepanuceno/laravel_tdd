@@ -35,6 +35,7 @@ class UserRepository implements UserRepositoryInterface
     public function update(string $email, array $data): object
     {
         $user = $this->find($email)->first();
+
         $user->update($data);
         $user->refresh();
         return $user;
@@ -42,12 +43,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function delete(string $email): bool
     {
-
         $user = $this->find($email)->first();
-        if(!$user) {
-            throw new NotFoundException("User not Found");
-        }
-
         return $user->delete();
     }
 

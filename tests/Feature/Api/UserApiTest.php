@@ -87,4 +87,30 @@ class UserApiTest extends TestCase
                     ]
                 ];
     }
+
+    public function test_find_user()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson("{$this->endpoint}/{$user->email}");
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonStructure(
+            [
+                'data' => [
+                    'id',
+                    'name',
+                    'email'
+                ]
+            ]
+        );
+    }
+
+    public function test_find_user_not_found()
+    {
+
+        $response = $this->getJson("{$this->endpoint}/teste@mail.com}");
+
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
 }
