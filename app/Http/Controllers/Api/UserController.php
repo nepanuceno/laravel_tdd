@@ -50,4 +50,10 @@ class UserController extends Controller
         $user = $this->repositoryInterface->update($email, $request->validated());
         return new UserResource($user);
     }
+
+    public function destroy($email)
+    {
+        $this->repositoryInterface->delete($email);
+        return response()->noContent();
+    }
 }

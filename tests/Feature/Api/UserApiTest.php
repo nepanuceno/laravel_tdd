@@ -114,36 +114,68 @@ class UserApiTest extends TestCase
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
-    public function test_user_update()
+    /**
+     * @dataProvider dataProviderUserUpdate
+     */
+    public function test_user_update(array $payload, int $statusCode, string $email='')
     {
         $user = User::factory()->create();
 
-        $payload = [
-            'name' => 'Name UPdate',
-            'password' => 'new_password'
-        ];
+        if ($email === '') {
+            $email=$user->email;
+        }
 
-        $response = $this->putJson("{$this->endpoint}/{$user->email}", $payload);
+        $response = $this->putJson("{$this->endpoint}/{$email}", $payload);
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus($statusCode);
     }
 
-    public function test_user_update_validations()
+
+    public function dataProviderUserUpdate(): array
+    {
+        return [
+            'Test Update OK' =>[
+                'payload' => [
+                    'name' => 'Name Update',
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_OK,
+            ],
+            'Test Update Name Less' =>[
+                'payload' => [
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'Test Update Short PassWord' => [
+                'payload' => [
+                    'name' => 'Name Update',
+                    'password' => 'ne'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'Test Update Long PassWord' => [
+                'payload' => [
+                    'name' => 'Name Update',
+                    'password' => 'nefsrgrfthaerghserthasefgaesrgsergsa'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'Test Update User Not Found' =>[
+                'payload' => [
+                    'name' => 'Name Update',
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_NOT_FOUND,
+                'email' => 'Fake_Mail'
+            ],
+        ];
+    }
+
+    public function test_user_delete()
     {
         $user = User::factory()->create();
-
-        $payload = [
-            'name' => 'Name Update',
-            'password' => 'ne'
-        ];
-
-        $response = $this->putJson("{$this->endpoint}/{$user->email}", $payload);
-
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response = $this->deleteJson("{$this->endpoint}/{$user->email}");
+        $response->assertNoContent();
     }
-
-    // public function test_user_delete()
-    // {
-
-    // }
 }
