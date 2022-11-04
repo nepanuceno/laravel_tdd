@@ -13,16 +13,14 @@ class UserApiTest extends TestCase
     protected string $endpoint = '/api/users';
 
     /**
-     * A basic feature test example.
-     *
-     * @return void
+     * @dataProvider dataProviderPagination
      */
-    public function test_paginate()
+    public function test_paginate(int $total, int $page=1, int $perPage=15)
     {
-        User::factory()->count(40)->create();
-        $response = $this->getJson($this->endpoint);
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(15, 'data');
+        User::factory()->count($total)->create();
+        $response = $this->getJson("{$this->endpoint}?page={$page}");
+        $response->assertOk();
+        $response->assertJsonCount($perPage, 'data');
         $response->assertJsonStructure([
             'meta' => [
                 'total',
@@ -30,53 +28,43 @@ class UserApiTest extends TestCase
                 'last_page',
                 'first_page',
                 'per_page',
+            ],
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'email'
+                ]
             ]
         ]);
 
-        $response->assertJsonFragment(['total'=> 40]);
-        $response->assertJsonFragment(['current_page'=> 1]);
+        $response->assertJsonFragment(['total'=> $total]);
+        $response->assertJsonFragment(['current_page'=> $page]);
     }
 
-    public function test_page_two()
+    public function dataProviderPagination(): array
     {
-        User::factory()->count(20)->create();
-        $response = $this->getJson("{$this->endpoint}?page=2");
-        $response->assertOK();
-        $response->assertJsonCount(5, 'data');
-        $response->assertJsonStructure([
-            'meta' => [
-                'total',
-                'current_page',
-                'last_page',
-                'first_page',
-                'per_page',
-            ]
-        ]);
-
-        $response->assertJsonFragment(['total'=> 20]);
-        $response->assertJsonFragment(['current_page'=> 2]);
+        return [
+            'Total test page 1 with 15 registers for page' => ['total'=>40, 'page'=> 1, 'perPage'=> 15],
+            'Total test page 2 with 5 registers for page' => ['total'=>20, 'page'=> 2, 'perPage'=> 5],
+            'Total test page 1 with 0 registers for page' =>  ['total'=> 0, 'page'=> 1, 'perPage'=> 0],
+            'Total test page 4 with 15 registers for page' =>  ['total'=> 100, 'page'=> 4, 'perPage'=> 15],
+        ];
     }
 
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_paginate_empty()
+    public function test_create()
     {
-        $response = $this->getJson($this->endpoint);
-        $response->assertOK();
-        $response->assertJsonCount(0, 'data');
+        $payload = [
+            'name' => 'Paulo Roberto Torres',
+            'email' => 'paulo.torres.apps@gmail.com',
+            'password' => '12345678'
+        ];
+
+        $response = $this->postJson($this->endpoint, $payload);
+        $response->dump();
+        $response->assertCreated();
         $response->assertJsonStructure([
-            'meta' => [
-                'total',
-                'current_page',
-                'last_page',
-                'first_page',
-                'per_page',
-            ]
+            'data'=> ['id', 'name', 'email']
         ]);
-        $response->assertJsonFragment(['total'=> 0]);
-        $response->assertJsonFragment(['current_page'=> 1]);
     }
 }
